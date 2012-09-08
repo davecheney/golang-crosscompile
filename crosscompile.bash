@@ -37,6 +37,16 @@ function go-crosscompile-build-all {
 	done
 }	
 
+function go-all {
+	for PLATFORM in $PLATFORMS; do
+		GOOS=${PLATFORM%/*}
+        	GOARCH=${PLATFORM#*/}
+                CMD="go-${GOOS}-${GOARCH} $@"
+                echo "$CMD"
+                $CMD
+        done
+}
+
 for PLATFORM in $PLATFORMS; do
 	go-alias $PLATFORM
 done
