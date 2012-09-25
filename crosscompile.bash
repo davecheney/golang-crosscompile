@@ -9,6 +9,9 @@ PLATFORMS="darwin/386 darwin/amd64 freebsd/386 freebsd/amd64 linux/386 linux/amd
 
 eval "$(go env)"
 
+# Need to export GOROOT to the calling environment.
+echo "export $(go env | grep GOROOT)"
+
 function cgo-enabled {
   if [ "$1" = "${GOHOSTOS}" ]; then
     echo 1
@@ -20,32 +23,38 @@ function cgo-enabled {
 function go-alias {
   GOOS=${1%/*}
   GOARCH=${1#*/}
-  eval "function go-${GOOS}-${GOARCH} { (CGO_ENABLED=$(cgo-enabled ${GOOS} ${GOARCH}) GOOS=${GOOS} GOARCH=${GOARCH} go \$@ ) }"
+  echo "
+function go-${GOOS}-${GOARCH} {
+  CGO_ENABLED=$(cgo-enabled ${GOOS} ${GOARCH}) GOOS=${GOOS} GOARCH=${GOARCH} go \$@
+}"
+  echo "
+function go-crosscompile-build-${GOOS}-${GOARCH} {
+  cd \${GOROOT}/src
+  CGO_ENABLED=$(cgo-enabled ${GOOS} ${GOARCH}) GOOS=${GOOS} GOARCH=${GOARCH} ./make.bash --no-clean 2>&1
+}"
 }
 
-function go-crosscompile-build {
-  GOOS=${1%/*}
-  GOARCH=${1#*/}
-  cd ${GOROOT}/src ; CGO_ENABLED=$(cgo-enabled ${GOOS} ${GOARCH}) GOOS=${GOOS} GOARCH=${GOARCH} ./make.bash --no-clean 2>&1
-}
-
+echo "
 function go-crosscompile-build-all {
   for PLATFORM in $PLATFORMS; do
-    CMD="go-crosscompile-build ${PLATFORM}"
-    echo "$CMD"
-    $CMD >/dev/null
+    GOOS=\${PLATFORM%/*}
+    GOARCH=\${PLATFORM#*/}
+    echo \"go-crosscompile-build-\${GOOS}-\${GOARCH}\"
+    go-crosscompile-build-\${GOOS}-\${GOARCH} >/dev/null
   done
 }
+"
 
+echo "
 function go-all {
   for PLATFORM in $PLATFORMS; do
-    GOOS=${PLATFORM%/*}
-    GOARCH=${PLATFORM#*/}
-    CMD="go-${GOOS}-${GOARCH} $@"
-    echo "$CMD"
-    $CMD
+    GOOS=\${PLATFORM%/*}
+    GOARCH=\${PLATFORM#*/}
+    echo \"go-\${GOOS}-\${GOARCH} \$@\"
+    go-\${GOOS}-\${GOARCH} \$@
   done
 }
+"
 
 for PLATFORM in $PLATFORMS; do
   go-alias $PLATFORM
