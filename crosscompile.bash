@@ -13,49 +13,49 @@ eval "$(go env)"
 echo "export $(go env | grep GOROOT)"
 
 function cgo-enabled {
-  if [ "$1" = "${GOHOSTOS}" ]; then
-    echo 1
-  else
-    echo 0
-  fi
+	if [ "$1" = "${GOHOSTOS}" ]; then
+		echo 1
+	else
+		echo 0
+	fi
 }
 
 function go-alias {
-  GOOS=${1%/*}
-  GOARCH=${1#*/}
-  echo "
+	GOOS=${1%/*}
+	GOARCH=${1#*/}
+	echo "
 function go-${GOOS}-${GOARCH} {
-  CGO_ENABLED=$(cgo-enabled ${GOOS} ${GOARCH}) GOOS=${GOOS} GOARCH=${GOARCH} go \$@
+	CGO_ENABLED=$(cgo-enabled ${GOOS} ${GOARCH}) GOOS=${GOOS} GOARCH=${GOARCH} go \$@
 }"
-  echo "
+	echo "
 function go-crosscompile-build-${GOOS}-${GOARCH} {
-  cd \${GOROOT}/src
-  CGO_ENABLED=$(cgo-enabled ${GOOS} ${GOARCH}) GOOS=${GOOS} GOARCH=${GOARCH} ./make.bash --no-clean 2>&1
+	cd \${GOROOT}/src
+	CGO_ENABLED=$(cgo-enabled ${GOOS} ${GOARCH}) GOOS=${GOOS} GOARCH=${GOARCH} ./make.bash --no-clean 2>&1
 }"
 }
 
 echo "
 function go-crosscompile-build-all {
-  for PLATFORM in $PLATFORMS; do
-    GOOS=\${PLATFORM%/*}
-    GOARCH=\${PLATFORM#*/}
-    echo \"go-crosscompile-build-\${GOOS}-\${GOARCH}\"
-    go-crosscompile-build-\${GOOS}-\${GOARCH} >/dev/null
-  done
+	for PLATFORM in $PLATFORMS; do
+		GOOS=\${PLATFORM%/*}
+		GOARCH=\${PLATFORM#*/}
+		echo \"go-crosscompile-build-\${GOOS}-\${GOARCH}\"
+		go-crosscompile-build-\${GOOS}-\${GOARCH} >/dev/null
+	done
 }
 "
 
 echo "
 function go-all {
-  for PLATFORM in $PLATFORMS; do
-    GOOS=\${PLATFORM%/*}
-    GOARCH=\${PLATFORM#*/}
-    echo \"go-\${GOOS}-\${GOARCH} \$@\"
-    go-\${GOOS}-\${GOARCH} \$@
-  done
+	for PLATFORM in $PLATFORMS; do
+		GOOS=\${PLATFORM%/*}
+		GOARCH=\${PLATFORM#*/}
+		echo \"go-\${GOOS}-\${GOARCH} \$@\"
+		go-\${GOOS}-\${GOARCH} \$@
+	done
 }
 "
 
 for PLATFORM in $PLATFORMS; do
-  go-alias $PLATFORM
+	go-alias $PLATFORM
 done
