@@ -5,13 +5,18 @@
 
 # support functions for go cross compilation
 
-PLATFORMS="darwin/386 darwin/amd64 freebsd/386 freebsd/amd64 linux/386 linux/amd64 linux/arm windows/386 windows/amd64"
+PLATFORMS="darwin/386 darwin/amd64 freebsd/386 freebsd/amd64 freebsd/arm linux/386 linux/amd64 linux/arm windows/386 windows/amd64"
 
 eval "$(go env)"
 
 function cgo-enabled {
-	if [ "$1" = "${GOHOSTOS}" ]; then 
-		echo 1
+	if [ "$1" = "${GOHOSTOS}" ]; then
+		if [ "${GOHOSTOS}" != "freebsd/arm" ]; then
+			echo 1
+		else
+			# cgo is not freebsd/arm
+			echo 0	
+		fi
 	else 
 		echo 0
 	fi
@@ -40,14 +45,15 @@ function go-crosscompile-build-all {
 function go-all {
 	for PLATFORM in $PLATFORMS; do
 		GOOS=${PLATFORM%/*}
-        	GOARCH=${PLATFORM#*/}
-                CMD="go-${GOOS}-${GOARCH} $@"
-                echo "$CMD"
-                $CMD
-        done
+		GOARCH=${PLATFORM#*/}
+		CMD="go-${GOOS}-${GOARCH} $@"
+		echo "$CMD"
+		$CMD
+	done
 }
 
 for PLATFORM in $PLATFORMS; do
 	go-alias $PLATFORM
 done
 
+unset -f go-alias
