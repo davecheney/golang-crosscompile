@@ -10,9 +10,9 @@ PLATFORMS="darwin/386 darwin/amd64 freebsd/386 freebsd/amd64 linux/386 linux/amd
 eval "$(go env)"
 
 function cgo-enabled {
-	if [ "$1" = "${GOHOSTOS}" ]; then 
+	if [ "$1" = "${GOHOSTOS}" ]; then
 		echo 1
-	else 
+	else
 		echo 0
 	fi
 }
@@ -35,8 +35,38 @@ function go-crosscompile-build-all {
 		echo "$CMD"
 		$CMD >/dev/null
 	done
-}	
+}
 
+function go-build-all {
+        for PLATFORM in $PLATFORMS; do
+      		GOOS=${PLATFORM%/*}
+        	GOARCH=${PLATFORM#*/}
+                #TODO - check if basename should actually be the next non-option argv. Or warn.
+                BASENAME=${PWD##*/}
+                # if necessary, set GOBIN according to go's usual logic
+                if [ -z "$GOBIN" ]; then
+                  MYGOBIN="$GOPATH/bin"
+                else
+                  MYGOBIN="$GOBIN"
+                fi
+                #echo "GOBIN=$GOBIN"
+                #MYGOBIN=${GOBIN:?"$GOPATH/bin"}
+                echo "$MYGOBIN"
+                # use a subfolder of GOBIN called xc
+                OUTPUTDIR="${MYGOBIN}/xc/$PLATFORM"
+                if [ "$GOOS" == "windows" ]; then
+                   BASENAME="$BASENAME.exe"
+                fi
+                CMD="go-${GOOS}-${GOARCH} build -o ${OUTPUTDIR}/${BASENAME} $@"
+                MKDIRCMD="mkdir -p \"$OUTPUTDIR\""
+                echo "Running: $MKDIRCMD"
+                mkdir -p "$OUTPUTDIR"
+                ls "$OUTPUTDIR"
+                echo "Running: $CMD"
+                $CMD
+        done
+
+}
 function go-all {
 	for PLATFORM in $PLATFORMS; do
 		GOOS=${PLATFORM%/*}
