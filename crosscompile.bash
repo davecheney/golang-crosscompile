@@ -53,7 +53,7 @@ function go-build-all {
                 #MYGOBIN=${GOBIN:?"$GOPATH/bin"}
                 echo "$MYGOBIN"
                 # use a subfolder of GOBIN called xc
-                OUTPUTDIR="${MYGOBIN}/xc/$PLATFORM"
+                OUTPUTDIR="${MYGOBIN}/xc/$BASENAME/$PLATFORM"
                 if [ "$GOOS" == "windows" ]; then
                    BASENAME="$BASENAME.exe"
                 fi
