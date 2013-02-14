@@ -42,23 +42,27 @@ function go-build-all {
       		GOOS=${PLATFORM%/*}
         	GOARCH=${PLATFORM#*/}
                 #TODO - check if basename should actually be the next non-option argv. Or warn.
-                BASENAME=${PWD##*/}
-                # if necessary, set GOBIN according to go's usual logic
-                if [ -z "$GOBIN" ]; then
-                  MYGOBIN="$GOPATH/bin"
-                else
-                  MYGOBIN="$GOBIN"
+                APPNAME=${PWD##*/}
+                # You can set OUTPUTDIR as an environment variable.
+                # Otherwise it defaults to a subfolder of $GOBIN called $APPNAME-xc
+                if [ -z "$OUTPUTDIR" ]; then
+                   # if necessary, set GOBIN according to go's usual logic
+                   if [ -z "$GOBIN" ]; then
+                     MYGOBIN="$GOPATH/bin"
+                   else
+                     MYGOBIN="$GOBIN"
+                   fi
+                   echo "$MYGOBIN"
+                   OUTPUTDIR="${MYGOBIN}/$APPNAME-xc"
                 fi
-                #echo "GOBIN=$GOBIN"
-                #MYGOBIN=${GOBIN:?"$GOPATH/bin"}
-                echo "$MYGOBIN"
-                # use a subfolder of GOBIN called xc
-                OUTPUTDIR="${MYGOBIN}/xc/$BASENAME/$PLATFORM"
+                FULLOUTPUTDIR="${OUTPUTDIR}/${GOOS}_${GOARCH}"
                 if [ "$GOOS" == "windows" ]; then
-                   BASENAME="$BASENAME.exe"
+                   EXENAME="$APPNAME.exe"
+                else
+                   EXENAME="$APPNAME"
                 fi
-                CMD="go-${GOOS}-${GOARCH} build -o ${OUTPUTDIR}/${BASENAME} $@"
-                MKDIRCMD="mkdir -p \"$OUTPUTDIR\""
+                CMD="go-${GOOS}-${GOARCH} build -o ${FULLOUTPUTDIR}/${EXENAME} $@"
+                MKDIRCMD="mkdir -p \"$FULLOUTPUTDIR\""
                 echo "Running: $MKDIRCMD"
                 mkdir -p "$OUTPUTDIR"
                 ls "$OUTPUTDIR"
