@@ -38,7 +38,10 @@ function go-crosscompile-build-all {
 	for PLATFORM in $PLATFORMS; do
 		CMD="go-crosscompile-build ${PLATFORM}"
 		echo "$CMD"
-		$CMD >/dev/null
+		$CMD || {
+                    echo "*** FAILED BUILD $PLATFORM ***"
+                    break
+                }
 	done
 }	
 
