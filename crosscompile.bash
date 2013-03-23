@@ -56,7 +56,8 @@ function go-build-all {
 	for PLATFORM in $PLATFORMS; do
 		GOOS=${PLATFORM%/*}
 		GOARCH=${PLATFORM#*/}
-		CMD="go-${GOOS}-${GOARCH} build -o $@-${GOOS}-${GOARCH} $@"
+		OUTPUT=`echo $@ | sed 's/\.go//'` 
+		CMD="go-${GOOS}-${GOARCH} build -o $OUTPUT-${GOOS}-${GOARCH} $@"
 		echo "$CMD"
 		$CMD
 	done
