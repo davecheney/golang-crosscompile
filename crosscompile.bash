@@ -52,6 +52,16 @@ function go-all {
 	done
 }
 
+function go-build-all {
+	for PLATFORM in $PLATFORMS; do
+		GOOS=${PLATFORM%/*}
+		GOARCH=${PLATFORM#*/}
+		CMD="go-${GOOS}-${GOARCH} build -o $@-${GOOS}-${GOARCH} $@"
+		echo "$CMD"
+		$CMD
+	done
+}
+
 for PLATFORM in $PLATFORMS; do
 	go-alias $PLATFORM
 done
