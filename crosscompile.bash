@@ -10,11 +10,12 @@ PLATFORMS="darwin/386 darwin/amd64 freebsd/386 freebsd/amd64 freebsd/arm linux/3
 eval "$(go env)"
 
 function cgo-enabled {
-	if [ "$1" = "${GOHOSTOS}" ]; then
-		if [ "${GOHOSTOS}" != "freebsd/arm" ]; then
+        GOHOSTOSARCH="${GOHOSTOS}/${GOARCH}"
+	if [ "$1" = "${GOHOSTOSARCH}" ]; then
+		if [ "${GOHOSTOSARCH}" != "freebsd/arm" ]; then
 			echo 1
 		else
-			# cgo is not freebsd/arm
+			# cgo is not available on freebsd/arm
 			echo 0	
 		fi
 	else 
