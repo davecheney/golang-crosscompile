@@ -9,29 +9,16 @@ PLATFORMS="darwin/386 darwin/amd64 freebsd/386 freebsd/amd64 freebsd/arm linux/3
 
 eval "$(go env)"
 
-function cgo-enabled {
-	if [ "$1" = "${GOHOSTOS}" ]; then
-		if [ "${GOHOSTOS}" != "freebsd/arm" ]; then
-			echo 1
-		else
-			# cgo is not freebsd/arm
-			echo 0	
-		fi
-	else 
-		echo 0
-	fi
-}
-
 function go-alias {
 	GOOS=${1%/*}
 	GOARCH=${1#*/}
-	eval "function go-${GOOS}-${GOARCH} { (CGO_ENABLED=$(cgo-enabled ${GOOS} ${GOARCH}) GOOS=${GOOS} GOARCH=${GOARCH} go \$@ ) }"
+	eval "function go-${GOOS}-${GOARCH} { ( GOOS=${GOOS} GOARCH=${GOARCH} go \$@ ) }"
 }
 
 function go-crosscompile-build {
 	GOOS=${1%/*}
 	GOARCH=${1#*/}
-	cd ${GOROOT}/src ; CGO_ENABLED=$(cgo-enabled ${GOOS} ${GOARCH}) GOOS=${GOOS} GOARCH=${GOARCH} ./make.bash --no-clean 2>&1
+	cd ${GOROOT}/src ; GOOS=${GOOS} GOARCH=${GOARCH} ./make.bash --no-clean 2>&1
 }
 
 function go-crosscompile-build-all {
