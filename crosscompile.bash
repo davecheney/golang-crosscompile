@@ -22,21 +22,47 @@ function go-crosscompile-build {
 }
 
 function go-crosscompile-build-all {
+	FAILURES=""
 	for PLATFORM in $PLATFORMS; do
 		CMD="go-crosscompile-build ${PLATFORM}"
 		echo "$CMD"
-		$CMD >/dev/null
+		$CMD || FAILURES="$FAILURES $PLATFORM"
 	done
+	if [ "$FAILURES" != "" ]; then
+	    echo "*** go-crosscompile-build-all FAILED on $FAILURES ***"
+	    return 1
+	fi
 }	
 
 function go-all {
+	FAILURES=""
 	for PLATFORM in $PLATFORMS; do
 		GOOS=${PLATFORM%/*}
 		GOARCH=${PLATFORM#*/}
 		CMD="go-${GOOS}-${GOARCH} $@"
 		echo "$CMD"
-		$CMD
+		$CMD || FAILURES="$FAILURES $PLATFORM"
 	done
+	if [ "$FAILURES" != "" ]; then
+	    echo "*** go-all FAILED on $FAILURES ***"
+	    return 1
+	fi
+}
+
+function go-build-all {
+	FAILURES=""
+	for PLATFORM in $PLATFORMS; do
+		GOOS=${PLATFORM%/*}
+		GOARCH=${PLATFORM#*/}
+		OUTPUT=`echo $@ | sed 's/\.go//'` 
+		CMD="go-${GOOS}-${GOARCH} build -o $OUTPUT-${GOOS}-${GOARCH} $@"
+		echo "$CMD"
+		$CMD || FAILURES="$FAILURES $PLATFORM"
+	done
+	if [ "$FAILURES" != "" ]; then
+	    echo "*** go-build-all FAILED on $FAILURES ***"
+	    return 1
+	fi
 }
 
 for PLATFORM in $PLATFORMS; do
