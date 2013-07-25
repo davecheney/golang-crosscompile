@@ -7,8 +7,6 @@
 
 PLATFORMS="darwin/386 darwin/amd64 freebsd/386 freebsd/amd64 freebsd/arm linux/386 linux/amd64 linux/arm windows/386 windows/amd64"
 
-eval "$(go env)"
-
 function go-alias {
 	GOOS=${1%/*}
 	GOARCH=${1#*/}
@@ -18,7 +16,7 @@ function go-alias {
 function go-crosscompile-build {
 	GOOS=${1%/*}
 	GOARCH=${1#*/}
-	cd ${GOROOT}/src ; GOOS=${GOOS} GOARCH=${GOARCH} ./make.bash --no-clean 2>&1
+	cd $(go env GOROOT)/src ; GOOS=${GOOS} GOARCH=${GOARCH} ./make.bash --no-clean 2>&1
 }
 
 function go-crosscompile-build-all {
