@@ -11,7 +11,7 @@ PLATFORMS="darwin/386 darwin/amd64 freebsd/386 freebsd/amd64 freebsd/arm linux/3
 function go-alias {
 	GOOS=${1%/*}
 	GOARCH=${1#*/}
-	eval "function go-${GOOS}-${GOARCH} { ( GOOS=${GOOS} GOARCH=${GOARCH} go \$@ ) }"
+	eval "function go-${GOOS}-${GOARCH} { ( GOOS=${GOOS} GOARCH=${GOARCH} go \"\$@\" ) }"
 }
 
 function go-crosscompile-build {
