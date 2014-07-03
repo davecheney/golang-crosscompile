@@ -6,7 +6,7 @@
 # support functions for go cross compilation
 
 type setopt >/dev/null 2>&1 && setopt shwordsplit
-PLATFORMS="darwin/386 darwin/amd64 freebsd/386 freebsd/amd64 freebsd/arm linux/386 linux/amd64 linux/arm windows/386 windows/amd64"
+PLATFORMS="darwin/386 darwin/amd64 freebsd/386 freebsd/amd64 freebsd/arm linux/386 linux/amd64 linux/arm windows/386 windows/amd64 nacl/amd64 nacl/386"
 
 function go-alias {
 	GOOS=${1%/*}
