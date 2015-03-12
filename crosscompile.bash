@@ -9,21 +9,21 @@ type setopt >/dev/null 2>&1 && setopt shwordsplit
 PLATFORMS="darwin/386 darwin/amd64 freebsd/386 freebsd/amd64 freebsd/arm linux/386 linux/amd64 linux/arm windows/386 windows/amd64 openbsd/386 openbsd/amd64"
 
 function go-alias {
-	GOOS=${1%/*}
-	GOARCH=${1#*/}
+	local GOOS=${1%/*}
+	local GOARCH=${1#*/}
 	eval "function go-${GOOS}-${GOARCH} { ( GOOS=${GOOS} GOARCH=${GOARCH} go \"\$@\" ) }"
 }
 
 function go-crosscompile-build {
-	GOOS=${1%/*}
-	GOARCH=${1#*/}
+	local GOOS=${1%/*}
+	local GOARCH=${1#*/}
 	cd $(go env GOROOT)/src ; GOOS=${GOOS} GOARCH=${GOARCH} ./make.bash --no-clean 2>&1
 }
 
 function go-crosscompile-build-all {
-	FAILURES=""
+	local FAILURES=""
 	for PLATFORM in $PLATFORMS; do
-		CMD="go-crosscompile-build ${PLATFORM}"
+		local CMD="go-crosscompile-build ${PLATFORM}"
 		echo "$CMD"
 		$CMD || FAILURES="$FAILURES $PLATFORM"
 	done
@@ -34,11 +34,11 @@ function go-crosscompile-build-all {
 }	
 
 function go-all {
-	FAILURES=""
+	local FAILURES=""
 	for PLATFORM in $PLATFORMS; do
-		GOOS=${PLATFORM%/*}
-		GOARCH=${PLATFORM#*/}
-		CMD="go-${GOOS}-${GOARCH} $@"
+		local GOOS=${PLATFORM%/*}
+		local GOARCH=${PLATFORM#*/}
+		local CMD="go-${GOOS}-${GOARCH} $@"
 		echo "$CMD"
 		$CMD || FAILURES="$FAILURES $PLATFORM"
 	done
@@ -49,14 +49,14 @@ function go-all {
 }
 
 function go-build-all {
-	FAILURES=""
+	local FAILURES=""
 	for PLATFORM in $PLATFORMS; do
-		GOOS=${PLATFORM%/*}
-		GOARCH=${PLATFORM#*/}
-		SRCFILENAME=`echo $@ | sed 's/\.go//'` 
-		CURDIRNAME=${PWD##*/}
-		OUTPUT=${SRCFILENAME:-$CURDIRNAME} # if no src file given, use current dir name
-		CMD="go-${GOOS}-${GOARCH} build -o $OUTPUT-${GOOS}-${GOARCH} $@"
+		local GOOS=${PLATFORM%/*}
+		local GOARCH=${PLATFORM#*/}
+		local SRCFILENAME=`echo $@ | sed 's/\.go//'`
+		local CURDIRNAME=${PWD##*/}
+		local OUTPUT=${SRCFILENAME:-$CURDIRNAME} # if no src file given, use current dir name
+		local CMD="go-${GOOS}-${GOARCH} build -o $OUTPUT-${GOOS}-${GOARCH} $@"
 		echo "$CMD"
 		$CMD || FAILURES="$FAILURES $PLATFORM"
 	done
